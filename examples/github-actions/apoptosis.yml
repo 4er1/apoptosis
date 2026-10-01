@@ -1,0 +1,39 @@
+# Scan nocturno que detecta flaky, los cuarentena y abre issues. El estado (.apoptosis/) viaja entre ejecuciones vía caché.
+# Copia a .github/workflows/ y ajusta el comando de pytest. (Ejemplo NO ejecutado contra un repo real.)
+name: apoptosis
+on:
+  schedule: [{ cron: "0 3 * * *" }]
+  workflow_dispatch:
+    inputs:
+      mode: { description: "scan | heal", default: "scan" }
+
+permissions:
+  contents: read
+  issues: write            # para abrir/comentar/cerrar issues con GITHUB_TOKEN
+
+jobs:
+  apoptosis:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12", cache: pip }
+      - run: pip install -r requirements.txt pytest-apoptosis
+      - uses: actions/cache@v4
+        with:
+          path: .apoptosis
+          key: apoptosis-${{ github.run_id }}
+          restore-keys: apoptosis-
+      - name: Scan o curación
+        env: { GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
+        run: |
+          if [ "${{ inputs.mode }}" = "heal" ]; then pytest --apoptosis-heal
+          else pytest --apoptosis-runs 10; fi
+      - run: apoptosis report -o apoptosis-report.html
+        if: always()
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: apoptosis, path: "apoptosis-report.html\n.apoptosis/issues" }
+
+# En los pipelines de cada PR usa:  pytest --apoptosis   (los flaky ya cuarentenados salen como skipped)
+# y restaura la misma caché (actions/cache con restore-keys: apoptosis-) para que conozca la cuarentena.

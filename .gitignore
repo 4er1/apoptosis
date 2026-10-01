@@ -1,0 +1,11 @@
+__pycache__/
+*.egg-info/
+.pytest_cache/
+.apoptosis/
+*.html.tmp
+.venv/
+.venv/
+.apoptosis/
+apoptosis-report.html
+__pycache__/
+*.egg-info/

@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pytest-apoptosis"
+version = "0.1.0"
+description = "Plugin de Pytest: detecta tests flaky, los cuarentena (apoptosis), abre issues en GitHub y los reintegra cuando se curan"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = ["pytest>=8"]
+classifiers = ["Framework :: Pytest", "Topic :: Software Development :: Testing"]
+
+[project.optional-dependencies]
+dev = ["pytest-xdist>=3"]
+
+[project.entry-points.pytest11]
+apoptosis = "apoptosis.plugin"
+
+[project.scripts]
+apoptosis = "apoptosis.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["apoptosis*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pytester_example_dir = "tests"
