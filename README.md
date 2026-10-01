@@ -132,4 +132,4 @@ tests/        44 tests (unit + pytester scenarios)     scripts/simulate.py (Mont
 docs/         sample dashboard + sample issue
 ```
 
-MIT © Selinne Carlin
+
